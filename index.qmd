@@ -1,0 +1,71 @@
+---
+title: "Machine Learning Sandwich for Agent-Based Models: Automatic calibration and post-processing adjustment for ABMs"
+author: George G. Vega Yon, Ph.D.
+institute: The University of Utah
+format:
+  revealjs:
+    footer: "George G. Vega Yon, Ph.D. -- <https://ggvy.cl>"
+---
+
+# Part 1: The problem
+
+## ABMs
+
+- Agent Based Models [ABMs] provide a general framework for modeling complex systems.
+
+- ABMs are especially popular in public health, epidemiology, and social sciences.
+
+- Most common goals of ABMs:
+    - Forecasting
+    - Scenario modeling
+
+
+## Calibration in ABMs
+
+- Calibration is the process of adjusting the parameters of a model to fit observed data.
+
+- How complex is? It depends on the model and the data.
+
+- Calibration needs to be done every time the model is used: every time we have a new dataset.
+
+## Calibration methods:
+
+There is no concensus on the best calibration approach. Some methods include:
+
+- Pulling existing parameters.
+
+- Grid search.
+
+- Markov models.
+
+The problem: calibration is time-consuming and requires expertise.
+
+## Forecasting in ABMs
+
+- Forecasting is the process of predicting future states of the system.
+
+- The flexibility of ABMs comes at a cost: precision.
+
+# Part 2: ML Sandwich
+
+## Automatic Calibration
+
+## Post-processing Adjustment
+
+# Part 3: Application
+
+## The model: SEIR model for Salt Lake County
+
+## Calibration examples
+
+## Forecasting examples
+
+## Concluding remarks
+
+### Thank you!
+
+::: {style="text-align: center;"}
+George G. Vega Yon, Ph.D.<br>
+The University of Utah<br>
+<https://ggvy.cl>
+:::
