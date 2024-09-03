@@ -18,11 +18,39 @@ bibliography: ["references.bib"]
 
 # Motivation {background-color="black"}
 
+## Goals
+
+Using Machine Learning:
+
+1. Simplify the calibration of Agent-Based Models [ABMs].
+
+2. Improve the accuracy of ABM predictions.
+
 ## Machine Learning Sandwich for ABMs
 
 ![](fig/calibration-and-prediction.png)
 
 ## Calibration in ABMs
+
+- Calibration is the process of adjusting the parameters of a model to fit observed data.
+
+- How complex is? It depends on the model and the data.
+
+- Calibration needs to be done every time the model is used: every time we have a new dataset.
+
+## Calibration methods:
+
+There is no concensus on the best calibration approach. Some methods include:
+
+- Pulling existing parameters.
+
+- Grid search.
+
+- Markov models.
+
+The problem: calibration is time-consuming and requires expertise.
+
+# Mechanistic Machine Learning {background-color="black"}
 
 ## Machine Learning is Broken
 
@@ -86,37 +114,6 @@ ML can help explain what theory hasn't... but we still need theory [@lazerParabl
 
 
 
-
-## ABMs
-
-- Agent Based Models [ABMs] provide a general framework for modeling complex systems.
-
-- ABMs are especially popular in public health, epidemiology, and social sciences.
-
-- Most common goals of ABMs:
-    - Forecasting
-    - Scenario modeling
-
-
-## Calibration in ABMs
-
-- Calibration is the process of adjusting the parameters of a model to fit observed data.
-
-- How complex is? It depends on the model and the data.
-
-- Calibration needs to be done every time the model is used: every time we have a new dataset.
-
-## Calibration methods:
-
-There is no concensus on the best calibration approach. Some methods include:
-
-- Pulling existing parameters.
-
-- Grid search.
-
-- Markov models.
-
-The problem: calibration is time-consuming and requires expertise.
 
 ## Forecasting in ABMs
 
