@@ -18,37 +18,29 @@ bibliography: ["references.bib"]
 
 # Motivation {background-color="black"}
 
-## Goals
+## Motivation: Agent-Based Models in Science and Policy
 
-Using Machine Learning:
+::: {.incremental}
+- Agent-Based Models [ABMs] are an important tool for scientific research and **policy-making**:
+  - For scenario modeling: "What if we do X?"
+  - For forecasting: "How many cases will we have in the next week?"
 
-1. Simplify the calibration of Agent-Based Models [ABMs].
+- {{< fa compass-drafting >}} Calibration can be time-consuming: grid search, Markov models, etc.
 
-2. Improve the accuracy of ABM predictions.
+- There's **no consensus on the best calibration approach**.
+
+- {{< fa chart-line >}} ABMs (and models in general) are **limited in their predictive power**.
+:::
+
+::: {layout-ncol="2" layout-valign="center"}
+![](fig/chicago-btm-fig-2.png.avif){width="60%" fig-align="center"}
+
+Schematic of compartmental and ABMs used by the US Centers for Disease and Control Prevention during a Measles Outbreak Response @cdcModelHowDisease2024.
+:::
 
 ## Machine Learning Sandwich for ABMs
 
-![](fig/calibration-and-prediction.png)
-
-## Calibration in ABMs
-
-- Calibration is the process of adjusting the parameters of a model to fit observed data.
-
-- How complex is? It depends on the model and the data.
-
-- Calibration needs to be done every time the model is used: every time we have a new dataset.
-
-## Calibration methods:
-
-There is no concensus on the best calibration approach. Some methods include:
-
-- Pulling existing parameters.
-
-- Grid search.
-
-- Markov models.
-
-The problem: calibration is time-consuming and requires expertise.
+![](fig/mechml-overview.svg){fig-align="center" width="90%"}
 
 # Mechanistic Machine Learning {background-color="black"}
 
@@ -112,68 +104,9 @@ ML can help explain what theory hasn't... but we still need theory [@lazerParabl
 2. This isn't just an ML ensemble; you must have an ML and a Mech model.
 :::
 
+# How to MechML? {background-color="black"}
 
-
-
-## Forecasting in ABMs
-
-- Forecasting is the process of predicting future states of the system.
-
-- The flexibility of ABMs comes at a cost: precision.
-
-# Mechanistic Machine Learning {background-color="black"}
-
-## Example: Improving accuracy in classification
-
-Example model by speaker using mechanistic machine learning to improve accuracy in prediction of gene functions.
-
-![](fig/mcmc-analysis-unif-prior-curated-auc-and-mae.png){fig-align="center"}
-
-## Automatic Calibration
-
-## Post-processing Adjustment
-
-# Part 3: Application
-
-## The model: SEIR model for Salt Lake County
-
-## Calibration examples
-
-## Forecasting examples
-
-- Using data from Utah Department of Health and Human Services: <ibis.utah.gov/ibisph-view/>
-
-```{r}
-#| label: cases
-#| warning: false
-#| message: false
-#| out-width: 90%
-library(data.table)
-library(ggplot2)
-covid19_cases <- fread("data-raw/covid19-utah-cases.csv")
-
-# Convert date to date format
-covid19_cases$date <- as.IDate(covid19_cases$date, format = "%m/%d/%y")
-
-# Extracting the week of the year
-covid19_cases$week <- as.numeric(format(covid19_cases$date, "%V"))
-covid19_cases$year <- as.numeric(format(covid19_cases$date, "%Y"))
-
-# Adding up by week
-covid19_weekly <- covid19_cases[, .(cases = sum(cases)), by = .(week, year)]
-
-# Line plot using ggplot2
-covid19_cases[date >= "2023-08-20"] |>
-  ggplot(aes(x = date, y = cases)) +
-  geom_line(aes(group=1)) +
-  labs(title = "COVID-19 cases in Utah",
-       x = "Date",
-       y = "Cases")
-```
-
-# Ways to do MechML {background-color="black"}
-
-## Correcting prediction errors
+## How to MechML: Correcting prediction errors
 
 ::: {}
 ![](fig/mechml-errors.svg){fig-align="center" width="50%"}
@@ -187,7 +120,7 @@ $$
 
 where $\widehat{\boldsymbol{\varepsilon}}\equiv \left(\mathcal{M}(\boldsymbol{\theta}) - y_{obs}\right)$ ABM forecast error, $\boldsymbol{y}_{obs}$ is the observed data, $f(\cdot)$ is a non-linear function, $\boldsymbol{x}$ are additional features for the model, and $\boldsymbol{\omega}$ is an array of weights associated with the ML o predict $\boldsymbol{\varepsilon}$.
 
-## Mech predictions as feature
+## How to MechML: Predictions as feature
 
 ::: {}
 ![](fig/mechml-feature.svg){fig-align="center" width="50%"}
@@ -199,7 +132,7 @@ $$
 Loss(\boldsymbol{\omega}) \equiv \left\lVert \boldsymbol{y}_{obs} - f\left(\boldsymbol{\omega}, \mathcal{M}(\boldsymbol{\theta}), \boldsymbol{x}\right)\right\rVert{}_p,
 $$
 
-## ML with a mechanistic penalty
+## How to MechML: Mechanistic penalty
 
 ::: {}
 ![](fig/mechml-penalty.svg){fig-align="center" width="50%"}
@@ -212,6 +145,95 @@ Loss(\boldsymbol{\omega}) \equiv \left\lVert \boldsymbol{y}_{obs} - f\left(\bold
 $$
 
 where $\lambda$ is a hyperparameter that controls the weight of the mechanistic penalty.
+
+# Preliminary results in calibration {{< fa compass-drafting >}} {background-color="black"}
+
+## Calibration {{< fa compass-drafting >}}
+
+Susceptible-Infected Recovered model:
+
+::: {layout-ncol="2"}
+- Agent Based Model with `epiworldR`.
+- Fully connected graph (everyone is connected to everyone).
+- We ran 20,000 simulations
+- Parameters of interest: 
+  - Initial state
+  - Contact rate
+  - Probability of transmission
+  - Probability of recovery
+
+```{r}
+#| fig-asp: 1
+#| echo: false
+#| out-width: 70%
+library(epiworldR)
+set.seed(123)
+truth <- c(.01, 8, .3, .3)
+abm <- ModelSIRCONN(
+  "mycon",
+  prevalence        = truth[1],
+  contact_rate      = truth[2],
+  transmission_rate = truth[3],
+  recovery_rate     = truth[4],
+  n                 = 50000
+)
+
+verbose_off(abm)
+
+run(abm, 100, 223)
+op<-par(cex=3)
+plot(abm, main="")
+par(op)
+```
+:::
+
+
+::: {style="font-size: 120%"}
+We trained a convolutional neural network to build our calibrator:
+
+$$
+\mathcal{C}: \text{Epicurves} \to \boldsymbol{\theta}
+$$
+
+Where $\boldsymbol{\theta} = \left[\text{Init. state}\text{Contact Rate}, \text{P(transmit)}, \text{P(recover)}\right]$
+
+:::
+
+## Calibration  {{< fa compass-drafting >}}: CNN Architecture
+
+![](fig/CNN.drawio.svg){fig-align="center" width="90%"}
+
+## Calibration  {{< fa compass-drafting >}}: Model fit
+
+![](fig/sir-cnn.png){fig-align="center" width="90%"}
+
+## Calibration  {{< fa compass-drafting >}}: Example
+
+::: {layout-ncol="2" .incremental  layout-valign="center"}
+
+|Parameter    | Predicted| Truth|
+|:------------|---------:|-----:|
+|Init. state  |      0.01|  0.01|
+|Contact Rate |      6.29|  8.00|
+|P(transmit)  |      0.33|  0.30|
+|P(recover)   |      0.33|  0.30|
+
+- Simple model does an OK job recovering the parameters.
+- Non-unique solution, e.g., lower contact rate and higher transmission rate.
+- Model does not deal with important factors: 
+  - What if the number of agents is 1,000,000?
+  - What if there's a policy/behavior change?
+:::
+
+# Example results in prediction {{< fa chart-line >}} {background-color="black"}
+
+## Example: Improving accuracy in classification
+
+Example model by speaker using mechanistic machine learning to improve accuracy in prediction of gene functions.
+
+![](fig/mcmc-analysis-unif-prior-curated-auc-and-mae.png){fig-align="center"}
+
+
 
 # Discussion 
 
