@@ -224,18 +224,35 @@ Where $\boldsymbol{\theta} = \left[\text{Init. state}\text{Contact Rate}, \text{
   - What if the number of agents is 1,000,000?
   - What if there's a policy/behavior change?
 :::
+::: {}
+```{r}
+#| fig-asp: 0.7
+#| echo: false
+#| out-width: 55%
+#| fig-align: center
+op<-par(cex=2, mai=c(4,4,0,0),lwd=2)
+plot(abm, main="")
+par(op)
+```
+:::
 
 # Example results in prediction {{< fa chart-line >}} {background-color="black"}
 
-## Example: Improving accuracy in classification
+
+## Prediction: Model of gene functions (0/1)
 
 Example model by speaker using mechanistic machine learning to improve accuracy in prediction of gene functions.
 
-![](fig/mcmc-analysis-unif-prior-curated-auc-and-mae.png){fig-align="center"}
-
-
-
-# Discussion 
+::: {.columns}
+::: {.column width="30%" .incremental}
+- Used a mechanistic model of evolution of gene functions to predict presence/absence of them.
+- ML model: logistic regression featuring a large number of parameters.
+- MechML: use the mechanistic predictions as features in the logit.
+:::
+::: {.column width="70%"}
+![](fig/logit-aucs-ols-aphylo.svg){fig-align="center"}
+:::
+:::
 
 ## Discussion
 
