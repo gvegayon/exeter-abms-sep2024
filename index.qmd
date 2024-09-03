@@ -1,13 +1,91 @@
 ---
-title: "Machine Learning Sandwich for Agent-Based Models: Automatic calibration and post-processing adjustment for ABMs"
+title: "Machine Learning Sandwich for Agent-Based Models"
+subtitle: "Automatic calibration and post-processing adjustment for ABMs"
 author: George G. Vega Yon, Ph.D.
 institute: The University of Utah
 format:
   revealjs:
     footer: "George G. Vega Yon, Ph.D. -- <https://ggvy.cl>"
+    self-contained-math: true
+    theme: ["default", "style.scss"]
+    title-slide-attributes: 
+      data-background-image: 'fig/Zoom-Background_PrideU.jpg'
+      data-background-opacity: '0.2'
+      data-background-size: 'contain'
+    slide-number: c
+bibliography: ["references.bib"]
 ---
 
-# Part 1: The problem
+# Motivation {background-color="black"}
+
+## Machine Learning Sandwich for ABMs
+
+![](fig/calibration-and-prediction.png)
+
+## Calibration in ABMs
+
+## Machine Learning is Broken
+
+::: {.fragment}
+- After all the data pouring, attention to causal inference and mechanistic models is coming back [@bakerMechanisticModelsMachine2018; @pearlSevenToolsCausal2019]
+:::
+
+::: {.fragment}
+- The case of Google Flu Trends: Paper reported a 0.97 correlation [@ginsbergDetectingInfluenzaEpidemics2009], but predictions overshoot by 100% [@kandulaReappraisingUtilityGoogle2019; @lazerParableGoogleFlu2014].
+:::
+
+
+![](fig/google-flu.png){width="90%" fig-align="center"}
+
+## Mechanistic Machine Learning
+
+Mechanistic Machine Learning [MechML]--*a.k.a.* theory-guided data science/machine learning: A hybrid between theory and data-driven prediction.
+
+::: {.columns style="font-size: 150%"}
+::: {.column width="45%" .callout .fragment}
+### Mechanistic models
+
+- Inference-driven (causality).
+- Great for small datasets.
+- Knowledge beyond the observed data.
+:::
+::: {.column width="45%" .callout .fragment}
+### Machine Learning
+
+- Data-driven (prediction).
+- Great for big data.
+- Finds hidden knowledge in observed data.
+:::
+:::
+
+::: {.fragment}
+ML can help explain what theory hasn't... but we still need theory [@lazerParableGoogleFlu2014]!
+:::
+
+## MechML: State-of-the-art
+
+::: {.incremental}
+- Adjusting errors in mechanistic-based prediction models (like ABMs). [@compagniHybridNeuralNetworkSEIR2022]
+
+- Incorporating mechanistically inferred data as an additional -omics layer. [@zampieriMachineDeepLearning2019]
+
+- Using pathway networks to add "external knowledge" as features. [@altaweraqiImprovedPredictionGene2022]
+
+- Creating a loss function with a mechanistic penalty for modeling tumor cell density [@gawIntegrationMachineLearning2019]
+
+- Using simulations to inform neural networks for epidemic forecasting [@wangTDEFSITheoryguidedDeep2020].
+
+- and more [@jornerMachineLearningMeets2021; @willardIntegratingScientificKnowledge2022a; @jiaPhysicsGuidedMachineLearning2021; @vonruedenInformedMachineLearning2023]
+:::
+
+::: {.callout-warning .fragment style="font-size: 120%"}
+1. Mechanistic Machine Learning **is not** domain-knowledge-aided feature engineering. You need a whole other model to complement the ML algorithm.
+
+2. This isn't just an ML ensemble; you must have an ML and a Mech model.
+:::
+
+
+
 
 ## ABMs
 
@@ -46,7 +124,13 @@ The problem: calibration is time-consuming and requires expertise.
 
 - The flexibility of ABMs comes at a cost: precision.
 
-# Part 2: ML Sandwich
+# Mechanistic Machine Learning {background-color="black"}
+
+## Example: Improving accuracy in classification
+
+Example model by speaker using mechanistic machine learning to improve accuracy in prediction of gene functions.
+
+![](fig/mcmc-analysis-unif-prior-curated-auc-and-mae.png){fig-align="center"}
 
 ## Automatic Calibration
 
@@ -60,12 +144,106 @@ The problem: calibration is time-consuming and requires expertise.
 
 ## Forecasting examples
 
-## Concluding remarks
+- Using data from Utah Department of Health and Human Services: <ibis.utah.gov/ibisph-view/>
 
+```{r}
+#| label: cases
+#| warning: false
+#| message: false
+#| out-width: 90%
+library(data.table)
+library(ggplot2)
+covid19_cases <- fread("data-raw/covid19-utah-cases.csv")
+
+# Convert date to date format
+covid19_cases$date <- as.IDate(covid19_cases$date, format = "%m/%d/%y")
+
+# Extracting the week of the year
+covid19_cases$week <- as.numeric(format(covid19_cases$date, "%V"))
+covid19_cases$year <- as.numeric(format(covid19_cases$date, "%Y"))
+
+# Adding up by week
+covid19_weekly <- covid19_cases[, .(cases = sum(cases)), by = .(week, year)]
+
+# Line plot using ggplot2
+covid19_cases[date >= "2023-08-20"] |>
+  ggplot(aes(x = date, y = cases)) +
+  geom_line(aes(group=1)) +
+  labs(title = "COVID-19 cases in Utah",
+       x = "Date",
+       y = "Cases")
+```
+
+# Ways to do MechML {background-color="black"}
+
+## Correcting prediction errors
+
+::: {}
+![](fig/mechml-errors.svg){fig-align="center" width="50%"}
+:::
+
+Train a model that predicts ABM forecast errors. The model takes the following form:
+
+$$
+Loss(\boldsymbol{\omega}): \left\{\mathcal{M}(\boldsymbol{\theta}), \boldsymbol{x}\right\} \to \widehat{\boldsymbol{\varepsilon}} \equiv \left\lVert \widehat{\boldsymbol{\varepsilon}} - f\left(\boldsymbol{\omega}, \mathcal{M}(\boldsymbol{\theta}), \boldsymbol{x}\right)\right\rVert{}_p,
+$$
+
+where $\widehat{\boldsymbol{\varepsilon}}\equiv \left(\mathcal{M}(\boldsymbol{\theta}) - y_{obs}\right)$ ABM forecast error, $\boldsymbol{y}_{obs}$ is the observed data, $f(\cdot)$ is a non-linear function, $\boldsymbol{x}$ are additional features for the model, and $\boldsymbol{\omega}$ is an array of weights associated with the ML o predict $\boldsymbol{\varepsilon}$.
+
+## Mech predictions as feature
+
+::: {}
+![](fig/mechml-feature.svg){fig-align="center" width="50%"}
+:::
+
+Use the ABM predictions as a feature in the ML model. The model takes the following form:
+
+$$
+Loss(\boldsymbol{\omega}) \equiv \left\lVert \boldsymbol{y}_{obs} - f\left(\boldsymbol{\omega}, \mathcal{M}(\boldsymbol{\theta}), \boldsymbol{x}\right)\right\rVert{}_p,
+$$
+
+## ML with a mechanistic penalty
+
+::: {}
+![](fig/mechml-penalty.svg){fig-align="center" width="50%"}
+:::
+
+Use a mechanistic penalty in the ML loss function. The model takes the following form:
+
+$$
+Loss(\boldsymbol{\omega}) \equiv \left\lVert \boldsymbol{y}_{obs} - f\left(\boldsymbol{\omega}, \boldsymbol{x}\right)\right\rVert{}_p + \lambda \left\lVert f\left(\boldsymbol{\omega}, \boldsymbol{x}\right) - \mathcal{M}(\theta)\right\rVert{}_p,
+$$
+
+where $\lambda$ is a hyperparameter that controls the weight of the mechanistic penalty.
+
+# Discussion 
+
+## Discussion
+
+::: {.incremental}
+- Machine learning (and big data) is excellent but has important limitations (e.g., Google Flu Trends).
+
+- Mechanistic models provide a causal understanding of phenomena but are limited when predicting.
+
+- We can use MechML to combine the best of both worlds (theory and data-driven prediction).
+
+- MechML is not theory-aided feature engineering.
+
+- At least three ways to apply it:
+
+  - ML to correct for systematic biases.
+
+  - Mech predictions as features in an ML algorithm.
+
+  - A Mech penalty embedded in the ML Loss function.
+:::
+
+::: {.fragment style="text-align: center;"}
 ### Thank you!
 
-::: {style="text-align: center;"}
 George G. Vega Yon, Ph.D.<br>
 The University of Utah<br>
 <https://ggvy.cl>
 :::
+
+## References
