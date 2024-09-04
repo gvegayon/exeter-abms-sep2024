@@ -13,7 +13,6 @@ format:
       data-background-opacity: '0.2'
       data-background-size: 'contain'
     slide-number: c
-    embed-resources: true
 bibliography: ["references.bib"]
 ---
 
@@ -290,21 +289,23 @@ Example model by speaker using mechanistic machine learning to improve accuracy 
 ## Discussion
 
 ::: {.incremental}
-- Machine learning (and big data) is excellent but has important limitations (e.g., Google Flu Trends).
+- ABMs are a powerful tool for research and policy analysis.
 
-- Mechanistic models provide a causal understanding of phenomena but are limited when predicting.
+- Overall, calibration and prediction are challenging tasks; the latter, even for advanced ML models.
 
-- We can use MechML to combine the best of both worlds (theory and data-driven prediction).
+- We propose a method that leverages the best of both worlds: mechanistic models and machine learning: **Machine Learning Sandwich for ~ABM~ Models**.
 
-- MechML is not theory-aided feature engineering.
+- The calibration step leverages artifical data for training.
 
-- At least three ways to apply it:
+- The forecasting step is addressed using Mechanistic Machine Learning [MechML]. At least three ways to apply it:
 
   - ML to correct for systematic biases.
 
   - Mech predictions as features in an ML algorithm.
 
   - A Mech penalty embedded in the ML Loss function.
+
+- Finally, we presented preliminary results on calibration of an SIR model and predictions using MechML for gene function prediction.
 :::
 
 ::: {.fragment style="text-align: center;"}
