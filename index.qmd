@@ -5,7 +5,7 @@ author: George G. Vega Yon, Ph.D.
 institute: The University of Utah
 format:
   revealjs:
-    footer: "George G. Vega Yon, Ph.D. -- <https://ggvy.cl>"
+    footer: "George G. Vega Yon, Ph.D. -- [ggv.cl/slides/exeter-abm-2024](https://ggv.cl/slides/exeter-abm-2024)"
     self-contained-math: true
     theme: ["default", "style.scss"]
     title-slide-attributes: 
@@ -13,6 +13,7 @@ format:
       data-background-opacity: '0.2'
       data-background-size: 'contain'
     slide-number: c
+    embed-resources: true
 bibliography: ["references.bib"]
 ---
 
@@ -41,6 +42,33 @@ Schematic of compartmental and ABMs used by the US Centers for Disease and Contr
 ## Machine Learning Sandwich for ABMs
 
 ![](fig/mechml-overview.svg){fig-align="center" width="90%"}
+
+# Using ML for Calibration
+
+## Using ML for Calibration
+
+![](fig/calibration-is-hard.png){width="90%" fig-align="center"}
+
+## Using ML for Calibration: A proposal
+
+::: {.incremental}
+1. Specify the model to be calibrated, for example, a SIR model. We will denote the model $\mathcal{M}: \boldsymbol{\theta} \to \mathbf{Y}$.
+
+2. Identify the model parameters $\boldsymbol{\theta}$ that will be calibrated. In the case of a SIR model, we may want to specify the contact, infection, and recovery rates.
+
+3. Simulate the model $N$ times drawing $\boldsymbol{\theta}$ from a prior distribution. The simulation procedure follows: For $i \in \{1,\dots,N\}$ do
+    - Draw $\boldsymbol{\theta}_i \sim \Theta_{\mbox{prior}}$; with a uniform distribution when no prior information is available.
+    - Draw $y_i$ from $\mathcal{M}(\boldsymbol{\theta}_i)$ and store it.
+    - next simulation.
+  
+    We will have our training dataset $T\equiv\left\{\boldsymbol{\theta}_i, y_i\right\}_{i=1}^N$.
+  
+4. Finally, we can use the training set to generate the mapping $\mathcal{C}: \boldsymbol{Y} \to \boldsymbol{\theta}$.
+:::
+
+::: {.fragment style="font-size: 150%" .callout}
+With the calibrated model $\mathcal{C}$, we can answer the question *"What parameters $\theta$ better fit the observed data?"*.
+:::
 
 # Mechanistic Machine Learning {background-color="black"}
 
@@ -152,7 +180,7 @@ where $\lambda$ is a hyperparameter that controls the weight of the mechanistic 
 
 Susceptible-Infected Recovered model:
 
-::: {layout-ncol="2"}
+::: {layout-ncol="2" .incremental}
 - Agent Based Model with `epiworldR`.
 - Fully connected graph (everyone is connected to everyone).
 - We ran 20,000 simulations
@@ -253,6 +281,11 @@ Example model by speaker using mechanistic machine learning to improve accuracy 
 ![](fig/logit-aucs-ols-aphylo.svg){fig-align="center"}
 :::
 :::
+
+## Machine Learning Sandwich for ABMs (repeat)
+
+![](fig/mechml-overview.svg){fig-align="center" width="90%"}
+
 
 ## Discussion
 
